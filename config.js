@@ -7,10 +7,10 @@
 //  y el panel avisa que falta configurar.
 // ============================================================
 window.KB_FIREBASE = {
-  apiKey: "",
-  authDomain: "",
-  projectId: "",
-  storageBucket: "",
-  messagingSenderId: "",
-  appId: ""
+  apiKey: "AIzaSyDNbF2Il9E-Z_xmD7-6lqHuzTirhJWKe_g",
+  authDomain: "karabela-ce50a.firebaseapp.com",
+  projectId: "karabela-ce50a",
+  storageBucket: "karabela-ce50a.firebasestorage.app",
+  messagingSenderId: "887612263150",
+  appId: "1:887612263150:web:ed61b6c4994eff0e8481ff"
 };
