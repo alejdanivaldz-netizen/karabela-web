@@ -7,6 +7,7 @@ compras; los pedidos se confirman por WhatsApp (0975 158 244).
 
 - `index.html` — sitio completo (catálogo de 763 productos, buscador, filtros, carrito y checkout; imágenes embebidas)
 - `favicon.png`, `apple-touch-icon.png` — ícono con la mariposa del logo
+- `og.jpg` — imagen que aparece al compartir el link (WhatsApp, Instagram, Facebook)
 - `robots.txt`
 
 ## Publicación (Cloudflare Pages)
@@ -15,6 +16,12 @@ compras; los pedidos se confirman por WhatsApp (0975 158 244).
    - Framework preset: **None** · Build command: *(vacío)* · Output directory: `/`
 2. Sin variables de entorno (el sitio es 100% estático).
 3. Dominio propio: pendiente — por ahora se usa `karabela-web.pages.dev`.
+
+## Novedades (cursos, tips, lanzamientos)
+
+La sección «Novedades» está en `index.html` y se muestra sola cuando la lista
+`NOVEDADES` (al inicio del script, con las instrucciones al lado) tiene al menos
+una entrada. Vacía = sección y enlace del menú ocultos.
 
 ## Actualización del catálogo
 
