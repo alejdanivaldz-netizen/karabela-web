@@ -1,38 +1,49 @@
 # karabela-web
 
 Tienda en línea de KarA-BelA Cosmétics (Pilar, Paraguay). Catálogo con carrito de
-compras; los pedidos se confirman por WhatsApp (0975 158 244).
+compras; los pedidos se confirman por WhatsApp. Desde la fase 2 el catálogo se
+administra desde un panel propio (`/admin/`) sobre Firebase.
 
 ## Estructura
 
-- `index.html` — sitio completo (catálogo de 763 productos, buscador, filtros, carrito y checkout; imágenes embebidas)
-- `favicon.png`, `apple-touch-icon.png` — ícono con la mariposa del logo
-- `og.jpg` — imagen que aparece al compartir el link (WhatsApp, Instagram, Facebook)
-- `robots.txt`
+- `index.html` — sitio público (catálogo, buscador, filtros, carrito y checkout). Lee el catálogo publicado desde Firestore; si no puede, usa `catalogo.json`.
+- `admin/` — panel de administración (login, productos, fotos, importación del export, pedidos, categorías, datos de la tienda).
+  - `admin/index.html` — pantalla; `admin/app.js` — Firebase y UI; `admin/logica.js` — lógica pura (columnas del export, comparación, snapshot).
+- `config.js` — configuración de Firebase (se completa una vez con los datos del proyecto).
+- `catalogo.json` — catálogo de respaldo (el de la fase 1). Lo usa la web si Firebase no responde y el panel para la «carga inicial».
+- `img/` — fotos de los destacados de la fase 1 (se suben a Storage con la carga inicial).
+- `logo.png`, `favicon.png`, `apple-touch-icon.png`, `robots.txt`.
+- `firestore.rules`, `storage.rules` — reglas de seguridad para pegar en la consola de Firebase.
+- `GUIA_F2.md` — guía paso a paso de la puesta en marcha.
 
 ## Publicación (Cloudflare Pages)
 
-1. Crear el proyecto en Cloudflare Pages conectado a este repo (rama `main`).
-   - Framework preset: **None** · Build command: *(vacío)* · Output directory: `/`
-2. Sin variables de entorno (el sitio es 100% estático).
-3. Dominio propio: pendiente — por ahora se usa `karabela-web.pages.dev`.
+Proyecto conectado a este repo (rama `main`), framework **None**, sin build, output `/`.
+Cada commit se publica solo en 1–2 minutos. Sin variables de entorno.
 
-## Novedades (cursos, tips, lanzamientos)
+## Cómo funciona por dentro
 
-La sección «Novedades» está en `index.html` y se muestra sola cuando la lista
-`NOVEDADES` (al inicio del script, con las instrucciones al lado) tiene al menos
-una entrada. Vacía = sección y enlace del menú ocultos.
-
-## Actualización del catálogo
-
-El catálogo sale del export del sistema de inventario de la tienda (products_*.xls).
-Proceso actual: re-exportar → pasar los archivos a Claude → se regenera `index.html`
-(solo productos con stock > 0, sin costos, sin filas internas).
-
-Fase 2 (previsto): panel de administración donde la dueña edita stock e imágenes
-de cada producto e importa el CSV directamente.
+- Firestore: `productos/{id}` (uno por producto), `config/tienda`, `config/categorias`,
+  `pedidos/{id}` y `publico/catalogo` (+ `publico/catalogo_N` si hay más de 700 productos).
+- Cada guardado en el panel regenera `publico/catalogo`, un documento liviano con solo lo
+  que se muestra. La web lo lee con **una** lectura por visita (API REST, sin SDK) y lo
+  guarda en `localStorage` para pintar al instante la próxima vez.
+- Fotos en Storage: `productos/{id}.jpg`, achicadas y comprimidas en el navegador antes de subir.
+- Pedidos: al enviar por WhatsApp, la web crea un documento en `pedidos` (las reglas solo
+  permiten crear con forma válida); el panel los lista y permite cambiar el estado.
+- Importación: se leen .xls/.xlsx/.csv con SheetJS en el navegador, se detectan las columnas
+  (código, nombre, categoría, precio, cantidad — el costo nunca se usa), se compara con lo
+  cargado y recién después de ver el resumen se aplica en lotes.
 
 ## Roadmap
 
-- F2: panel admin (stock + imágenes por producto + importación CSV)
+- F1: sitio + carrito → pedido por WhatsApp ✅
+- F2: panel admin (stock + fotos por producto + importación + pedidos + datos de la tienda) ✅ (este commit)
 - F3: pago con tarjeta vía Pagopar (requiere alta de comercio)
+
+## Cambios del 08/10/2026
+
+- Diseño nuevo de la web pública (marfil / vino / dorado, DM Serif Display + Jost), `og.jpg` para la vista previa al compartir.
+- Pedido: casilla de ofertas y cumpleaños (día y mes), con aviso de uso de datos.
+- Panel: pestañas **Clientas** (se derivan de `pedidos` + fichas en `clientes/{clave}`) y **Novedades** (`config/novedades`, se publican dentro de `publico/catalogo`).
+- `firestore.rules`: colección `clientes` solo para el panel; `pedidos.cliente` valida `acepta` y `cumple`.

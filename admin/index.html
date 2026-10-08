@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Panel — KarA-BelA Cosmétics</title>
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --rosa-bg: #fff5f8; --rosa-suave: #fde3ec; --rosa: #f7a6c4; --pink: #d6336c; --pink-strong: #b91d59;
+      --vino: #4a2030; --vino-soft: #8a5a68; --dorado: #c9a227; --verde: #1faa53; --ambar: #d98a00; --rojo: #c62828;
+      --blanco: #fff; --borde: #f3d9e3; --radius: 14px; --shadow: 0 4px 20px rgba(214, 51, 108, .10);
+      --font: "Poppins", system-ui, sans-serif;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { color-scheme: light; }
+    body { font-family: var(--font); color: var(--vino); background: var(--rosa-bg); line-height: 1.5; font-size: 14px; -webkit-font-smoothing: antialiased; min-height: 100dvh; }
+    button, input, select, textarea { font-family: var(--font); font-size: 14px; color: var(--vino); }
+    input, select, textarea { width: 100%; border: 1.5px solid var(--borde); border-radius: 10px; padding: 9px 12px; background: #fff; }
+    input:focus, select:focus, textarea:focus { outline: none; border-color: var(--pink); }
+    input[type="checkbox"] { width: auto; }
+    label { display: block; font-size: .8rem; font-weight: 600; margin-bottom: 4px; color: var(--vino); }
+    .campo { margin-bottom: 12px; }
+    .campo .ayuda { font-size: .74rem; color: var(--vino-soft); margin-top: 3px; }
+    .fila { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width: 640px) { .fila { grid-template-columns: 1fr; } }
+    [hidden] { display: none !important; }
+    a { color: var(--pink); }
+
+    /* Botones */
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 7px; font-weight: 600; border-radius: 99px; padding: 9px 18px; border: none; cursor: pointer; background: var(--pink); color: #fff; text-decoration: none; transition: transform .1s, background .1s; white-space: nowrap; }
+    .btn:hover { background: var(--pink-strong); }
+    .btn:disabled { opacity: .55; cursor: default; }
+    .btn.sec { background: #fff; color: var(--pink); border: 1.5px solid var(--pink); }
+    .btn.sec:hover { background: var(--rosa-suave); }
+    .btn.gris { background: #fff; color: var(--vino-soft); border: 1.5px solid var(--borde); }
+    .btn.peligro { background: #fff; color: var(--rojo); border: 1.5px solid #f0c4c4; }
+    .btn.chico { padding: 6px 12px; font-size: .8rem; }
+    .btn-ic { background: none; border: none; cursor: pointer; font-size: 1.05rem; padding: 4px 6px; border-radius: 8px; line-height: 1; }
+    .btn-ic:hover { background: var(--rosa-suave); }
+
+    /* Login */
+    #login { min-height: 100dvh; display: grid; place-items: center; padding: 20px; }
+    .login-card { background: #fff; border-radius: 22px; box-shadow: var(--shadow); padding: 36px 30px; width: min(400px, 100%); text-align: center; }
+    .login-card img { width: 220px; margin-bottom: 8px; }
+    .login-card h1 { font-size: 1.05rem; font-weight: 600; color: var(--vino-soft); margin-bottom: 22px; }
+    .login-card form { text-align: left; }
+    .login-card .btn { width: 100%; margin-top: 6px; }
+    .error { color: var(--rojo); font-size: .82rem; margin-top: 10px; }
+    .aviso { background: #fff7e0; border: 1px solid #f5dfa0; color: #7a5b00; padding: 12px 14px; border-radius: 12px; font-size: .84rem; text-align: left; line-height: 1.5; }
+    .aviso code { background: #fff; padding: 1px 5px; border-radius: 5px; }
+
+    /* Cabecera y pestañas */
+    .top { background: #fff; border-bottom: 1px solid var(--borde); position: sticky; top: 0; z-index: 20; }
+    .top-inner { max-width: 1240px; margin: 0 auto; padding: 8px 18px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+    .top-logo img { height: 30px; display: block; }
+    .top-logo span { font-size: .72rem; font-weight: 600; color: var(--vino-soft); text-transform: uppercase; letter-spacing: .1em; margin-left: 8px; }
+    .tabs { display: flex; gap: 2px; flex-wrap: wrap; }
+    .tab { background: none; border: none; cursor: pointer; padding: 8px 12px; border-radius: 99px; font-weight: 600; color: var(--vino-soft); }
+    .tab:hover { color: var(--pink); }
+    .tab.on { background: var(--rosa-suave); color: var(--pink); }
+    .tab .n { background: var(--pink); color: #fff; font-size: .68rem; padding: 1px 6px; border-radius: 99px; margin-left: 4px; vertical-align: 1px; }
+    .top-der { margin-left: auto; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: .8rem; color: var(--vino-soft); }
+    .pub { display: inline-flex; align-items: center; gap: 6px; border-radius: 99px; padding: 5px 12px; font-weight: 600; font-size: .78rem; background: #e9f8ee; color: #1b7a3d; }
+    .pub.trabajando { background: #fff5d6; color: #8a6100; }
+    .pub.error { background: #fdecec; color: var(--rojo); cursor: pointer; }
+    .pub.pendiente { background: var(--rosa-suave); color: var(--vino-soft); }
+    @media (max-width: 640px) { .top { position: static; } .top-inner { gap: 8px 12px; } #usuario { display: none; } }
+
+    main { max-width: 1240px; margin: 0 auto; padding: 22px 18px 60px; }
+    .panel { background: #fff; border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px; }
+    .panel + .panel { margin-top: 16px; }
+    h2 { font-size: 1.15rem; font-weight: 700; margin-bottom: 6px; }
+    .sub { color: var(--vino-soft); font-size: .86rem; margin-bottom: 14px; }
+    .toolbar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 14px; }
+    .toolbar input[type="search"] { flex: 1 1 220px; }
+    .toolbar select { width: auto; }
+    .contador { font-size: .8rem; color: var(--vino-soft); margin-left: auto; }
+
+    /* Tabla */
+    .tabla-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    table { width: 100%; border-collapse: collapse; font-size: .85rem; }
+    th { text-align: left; font-size: .72rem; text-transform: uppercase; letter-spacing: .06em; color: var(--vino-soft); padding: 8px 10px; border-bottom: 2px solid var(--rosa-suave); white-space: nowrap; }
+    td { padding: 8px 10px; border-bottom: 1px solid #faeef3; vertical-align: middle; }
+    tr:hover td { background: #fffafc; }
+    .thumb { width: 44px; height: 55px; border-radius: 8px; object-fit: cover; background: var(--rosa-suave); display: grid; place-items: center; font-size: 1.2rem; }
+    .nom { font-weight: 600; }
+    .nom small { display: block; color: var(--pink); font-weight: 500; }
+    .cod { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: .78rem; color: var(--vino-soft); }
+    .chip { display: inline-block; border-radius: 99px; padding: 2px 9px; font-size: .72rem; font-weight: 600; background: var(--rosa-suave); color: var(--vino); white-space: nowrap; }
+    .chip.ok { background: #e9f8ee; color: #1b7a3d; }
+    .chip.off { background: #f2f2f2; color: #777; }
+    .chip.warn { background: #fff5d6; color: #8a6100; }
+    .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .sw { position: relative; width: 38px; height: 22px; border-radius: 99px; background: #ddd; border: none; cursor: pointer; transition: background .15s; flex: none; }
+    .sw::after { content: ""; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 50%; background: #fff; transition: left .15s; }
+    .sw.on { background: var(--verde); }
+    .sw.on::after { left: 19px; }
+    .star { background: none; border: none; cursor: pointer; font-size: 1.15rem; color: #ddd; line-height: 1; }
+    .star.on { color: var(--dorado); }
+    .paginado { display: flex; gap: 8px; align-items: center; justify-content: center; margin-top: 14px; font-size: .84rem; color: var(--vino-soft); }
+    .vacio { text-align: center; padding: 40px 20px; color: var(--vino-soft); }
+    .vacio .btn { margin: 6px 4px 0; }
+
+    /* Modal */
+    .overlay { position: fixed; inset: 0; background: rgba(74,32,48,.45); z-index: 40; display: grid; place-items: center; padding: 14px; overflow-y: auto; }
+    .modal { background: #fff; border-radius: 20px; width: min(760px, 100%); max-height: calc(100dvh - 28px); overflow-y: auto; box-shadow: 0 20px 60px rgba(74,32,48,.3); }
+    .modal-head { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid var(--borde); position: sticky; top: 0; background: #fff; z-index: 1; }
+    .modal-head h3 { font-size: 1.05rem; }
+    .modal-body { padding: 18px 20px; }
+    .modal-foot { padding: 14px 20px; border-top: 1px solid var(--borde); display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap; position: sticky; bottom: 0; background: #fff; }
+    .modal-foot .izq { margin-right: auto; }
+    .foto-box { display: grid; grid-template-columns: 150px 1fr; gap: 16px; align-items: start; margin-bottom: 14px; }
+    .foto-prev { width: 150px; aspect-ratio: 4/5; border-radius: 12px; object-fit: cover; background: var(--rosa-suave); display: grid; place-items: center; font-size: 2.2rem; color: var(--vino-soft); overflow: hidden; }
+    .foto-prev img { width: 100%; height: 100%; object-fit: cover; }
+    .foto-prev div { display: grid; place-items: center; width: 100%; height: 100%; }
+    .foto-acciones { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
+    .foto-acciones p { font-size: .76rem; color: var(--vino-soft); }
+    .ro { background: #faf7f8; color: var(--vino-soft); }
+    .check { display: flex; align-items: center; gap: 10px; font-weight: 500; font-size: .9rem; margin: 8px 0; cursor: pointer; }
+    .check input { width: 18px; height: 18px; accent-color: var(--pink); }
+
+    /* Importar */
+    .drop { border: 2px dashed var(--rosa); border-radius: 16px; padding: 34px 20px; text-align: center; background: #fffafc; cursor: pointer; transition: background .1s; }
+    .drop:hover, .drop.over { background: var(--rosa-suave); }
+    .drop b { color: var(--pink); }
+    .drop input { display: none; }
+    .resumen { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin: 14px 0; }
+    .kpi { border: 1px solid var(--borde); border-radius: 12px; padding: 12px 14px; cursor: pointer; }
+    .kpi.on { border-color: var(--pink); background: #fffafc; }
+    .kpi b { display: block; font-size: 1.5rem; color: var(--pink); line-height: 1.1; }
+    .kpi span { font-size: .78rem; color: var(--vino-soft); }
+    .archivo { border: 1px solid var(--borde); border-radius: 12px; padding: 10px 14px; margin-bottom: 8px; font-size: .84rem; }
+    .archivo summary { cursor: pointer; font-weight: 600; }
+    .archivo .cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 8px; margin-top: 10px; }
+    .archivo .cols label { font-size: .72rem; }
+    .cambio { color: var(--vino-soft); font-size: .78rem; }
+    .cambio b { color: var(--vino); }
+    .progreso { height: 10px; border-radius: 99px; background: var(--rosa-suave); overflow: hidden; margin: 12px 0; }
+    .progreso div { height: 100%; background: var(--pink); width: 0; transition: width .2s; }
+    .ok-box { background: #e9f8ee; border: 1px solid #bfe6cc; color: #1b7a3d; padding: 14px; border-radius: 12px; }
+
+    /* Pedidos */
+    .pedido { border: 1px solid var(--borde); border-radius: 14px; padding: 12px 16px; margin-bottom: 10px; }
+    .pedido-head { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; cursor: pointer; }
+    .pedido-head .fecha { font-size: .78rem; color: var(--vino-soft); white-space: nowrap; }
+    .pedido-head .cli { font-weight: 600; flex: 1 1 160px; }
+    .pedido-head .tot { font-weight: 800; color: var(--pink); white-space: nowrap; }
+    .pedido-head select { width: auto; padding: 5px 10px; font-size: .8rem; border-radius: 99px; }
+    .pedido-det { margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--borde); font-size: .85rem; }
+    .pedido-det ul { list-style: none; margin: 6px 0; }
+    .pedido-det li { display: flex; justify-content: space-between; gap: 10px; padding: 3px 0; }
+    .est-nuevo { background: #fff5d6; } .est-confirmado { background: #e3f0ff; } .est-entregado { background: #e9f8ee; } .est-cancelado { background: #f2f2f2; }
+
+    /* Clientas y novedades */
+    .cli { border: 1px solid var(--borde); border-radius: 14px; padding: 12px 16px; margin-bottom: 10px; }
+    .cli-head { display: flex; gap: 10px 12px; align-items: center; flex-wrap: wrap; cursor: pointer; }
+    .cli-head .nombre { font-weight: 600; flex: 1 1 180px; }
+    .cli-head .nombre small { display: block; font-weight: 500; color: var(--vino-soft); }
+    .cli-head .tot { font-weight: 800; color: var(--pink); white-space: nowrap; }
+    .cli-det { margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--borde); font-size: .85rem; }
+    .cli-det h4 { font-size: .72rem; text-transform: uppercase; letter-spacing: .06em; color: var(--vino-soft); margin: 10px 0 4px; }
+    .cli-det ul { list-style: none; }
+    .cli-det li { display: flex; justify-content: space-between; gap: 10px; padding: 3px 0; border-bottom: 1px solid #faeef3; }
+    .cli-acc { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+    .btn.wa { background: var(--verde); } .btn.wa:hover { background: #178a43; }
+    .cumple-row { display: flex; gap: 10px 12px; align-items: center; flex-wrap: wrap; padding: 10px 0; border-bottom: 1px solid #faeef3; }
+    .cumple-row .cuando { font-weight: 700; color: var(--pink); min-width: 92px; }
+    .cumple-row .quien { flex: 1 1 160px; font-weight: 600; }
+    .nov-row { display: flex; gap: 10px 12px; align-items: center; flex-wrap: wrap; padding: 10px 0; border-bottom: 1px solid #faeef3; }
+    .nov-row .tit { flex: 1 1 200px; font-weight: 600; }
+    .nov-row .tit small { display: block; font-weight: 500; color: var(--vino-soft); }
+
+    /* Categorías */
+    .cat-row { display: grid; grid-template-columns: 1fr 90px 220px; gap: 12px; align-items: center; padding: 8px 0; border-bottom: 1px solid #faeef3; }
+    @media (max-width: 640px) { .cat-row { grid-template-columns: 1fr 60px; } .cat-row select { grid-column: 1 / -1; } }
+
+    .toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%) translateY(90px); background: var(--vino); color: #fff; padding: 10px 22px; border-radius: 99px; font-size: .88rem; z-index: 90; transition: transform .25s; max-width: 90vw; text-align: center; }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+    .toast.err { background: var(--rojo); }
+  </style>
+</head>
+<body>
+
+  <!-- ===== Login ===== -->
+  <div id="login">
+    <div class="login-card">
+      <img src="/logo.png" alt="KarA-BelA Cosmétics">
+      <h1>Panel de administración</h1>
+      <div id="login-sin-config" class="aviso" hidden>
+        Falta configurar Firebase: completá <code>config.js</code> con los datos del proyecto (ver la guía) y volvé a cargar esta página.
+      </div>
+      <form id="login-form">
+        <div class="campo"><label>Correo</label><input id="login-email" type="email" autocomplete="username" required></div>
+        <div class="campo"><label>Contraseña</label><input id="login-pass" type="password" autocomplete="current-password" required></div>
+        <button class="btn" type="submit" id="login-btn">Entrar</button>
+        <div class="error" id="login-error" hidden></div>
+        <p style="margin-top:14px;font-size:.8rem;text-align:center;"><a href="#" id="login-olvide">¿Olvidaste tu contraseña?</a></p>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===== App ===== -->
+  <div id="app" hidden>
+    <header class="top">
+      <div class="top-inner">
+        <a class="top-logo" href="/" target="_blank" title="Ver la web"><img src="/logo.png" alt="KarA-BelA"><span>Panel</span></a>
+        <nav class="tabs" id="tabs">
+          <button class="tab on" data-tab="productos">Productos</button>
+          <button class="tab" data-tab="importar">Importar</button>
+          <button class="tab" data-tab="pedidos">Pedidos<span class="n" id="pedidos-nuevos" hidden>0</span></button>
+          <button class="tab" data-tab="clientes">Clientas<span class="n" id="cumples-n" hidden>0</span></button>
+          <button class="tab" data-tab="novedades">Novedades</button>
+          <button class="tab" data-tab="categorias">Categorías</button>
+          <button class="tab" data-tab="tienda">Tienda</button>
+        </nav>
+        <div class="top-der">
+          <span class="pub pendiente" id="pub-estado" title="Estado de la publicación en la web">● Sin cambios</span>
+          <a href="/" target="_blank" rel="noopener">Ver la web ↗</a>
+          <span id="usuario"></span>
+          <button class="btn gris chico" id="salir">Salir</button>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <!-- Productos -->
+      <section id="tab-productos">
+        <div class="panel">
+          <div class="toolbar">
+            <input type="search" id="buscar" placeholder="🔍 Buscar por nombre o código…">
+            <select id="f-cat"><option value="">Todas las categorías</option></select>
+            <select id="f-estado">
+              <option value="">Todos</option>
+              <option value="publicados">Publicados en la web</option>
+              <option value="ocultos">Ocultos</option>
+              <option value="sinstock">Sin stock</option>
+              <option value="sinprecio">Sin precio</option>
+              <option value="destacados">Destacados ★</option>
+              <option value="confoto">Con foto</option>
+              <option value="sinfoto">Sin foto</option>
+              <option value="manuales">Cargados a mano</option>
+            </select>
+            <button class="btn" id="nuevo">+ Nuevo producto</button>
+            <span class="contador" id="contador"></span>
+          </div>
+          <div class="tabla-wrap">
+            <table id="tabla">
+              <thead><tr><th></th><th>Código</th><th>Nombre</th><th>Categoría</th><th class="num">Precio</th><th class="num">Stock</th><th>En la web</th><th>★</th><th></th></tr></thead>
+              <tbody id="tbody"></tbody>
+            </table>
+          </div>
+          <div class="vacio" id="vacio" hidden>
+            <p style="font-size:1.05rem;font-weight:600;">Todavía no hay productos cargados</p>
+            <p style="margin:6px 0 14px;">Podés empezar con el catálogo que ya estaba en la web (la fase 1) o importar directamente el export de tu sistema.</p>
+            <button class="btn" id="semilla">Cargar el catálogo inicial (fase 1)</button>
+            <button class="btn sec" id="ir-importar">Importar el export del sistema</button>
+          </div>
+          <div class="paginado" id="paginado" hidden>
+            <button class="btn gris chico" id="pag-ant">‹ Anterior</button>
+            <span id="pag-info"></span>
+            <button class="btn gris chico" id="pag-sig">Siguiente ›</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Importar -->
+      <section id="tab-importar" hidden>
+        <div class="panel">
+          <h2>Importar el export del sistema de inventario</h2>
+          <p class="sub">Exportá los productos desde tu sistema (.xls, .xlsx o .csv) y arrastrá acá los archivos — pueden ser varios a la vez. Se usan las columnas <b>código, nombre, categoría, precio y cantidad</b>. El costo nunca se sube a la web. Antes de aplicar vas a ver exactamente qué cambia.</p>
+          <label class="drop" id="drop">
+            <input type="file" id="archivos" multiple accept=".xls,.xlsx,.csv,.txt,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv">
+            <div style="font-size:2rem;">📂</div>
+            <div><b>Elegí los archivos</b> o arrastralos acá</div>
+            <div style="font-size:.78rem;color:var(--vino-soft);margin-top:4px;">.xls · .xlsx · .csv</div>
+          </label>
+          <div id="imp-archivos" style="margin-top:14px;"></div>
+        </div>
+        <div class="panel" id="imp-analisis" hidden>
+          <h2>Vista previa</h2>
+          <p class="sub" id="imp-nota"></p>
+          <div class="resumen" id="imp-kpis"></div>
+          <div class="tabla-wrap"><table><thead id="imp-thead"></thead><tbody id="imp-tbody"></tbody></table></div>
+          <p class="sub" id="imp-mas" hidden></p>
+          <label class="check" id="imp-cero-box"><input type="checkbox" id="imp-cero"> <span id="imp-cero-txt"></span></label>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;">
+            <button class="btn" id="imp-aplicar">Aplicar importación</button>
+            <button class="btn gris" id="imp-cancelar">Cancelar</button>
+          </div>
+          <div id="imp-progreso" hidden><div class="progreso"><div id="imp-barra"></div></div><p class="sub" id="imp-prog-txt"></p></div>
+          <div class="ok-box" id="imp-ok" hidden></div>
+        </div>
+      </section>
+
+      <!-- Pedidos -->
+      <section id="tab-pedidos" hidden>
+        <div class="panel">
+          <div class="toolbar">
+            <h2 style="margin:0;">Pedidos de la web</h2>
+            <select id="ped-filtro" style="margin-left:auto;">
+              <option value="">Todos</option>
+              <option value="nuevo">Nuevos</option>
+              <option value="confirmado">Confirmados</option>
+              <option value="entregado">Entregados</option>
+              <option value="cancelado">Cancelados</option>
+            </select>
+          </div>
+          <p class="sub">Cada pedido que la clienta envía por WhatsApp desde la web queda registrado acá. Cambiá el estado a medida que lo confirmás y entregás.</p>
+          <div id="pedidos-lista"></div>
+        </div>
+      </section>
+
+      <!-- Clientas -->
+      <section id="tab-clientes" hidden>
+        <div class="panel">
+          <h2>Cumpleaños de los próximos 15 días</h2>
+          <p class="sub">Tocá «Saludar» y se abre WhatsApp con el mensaje ya escrito; lo revisás y lo mandás vos.</p>
+          <div id="cumples-lista"></div>
+          <details class="archivo" style="margin-top:12px;">
+            <summary>Cambiar el mensaje de saludo</summary>
+            <div class="campo" style="margin-top:10px;"><textarea id="msg-cumple" rows="3" maxlength="400"></textarea><div class="ayuda">Donde pongas <b>{nombre}</b> va el nombre de la clienta. Escribí acá el regalo o el descuento que le das.</div></div>
+            <button class="btn chico" id="msg-cumple-guardar" type="button">Guardar mensaje</button>
+          </details>
+        </div>
+        <div class="panel">
+          <div class="toolbar">
+            <input type="search" id="cli-buscar" placeholder="🔍 Buscar por nombre o teléfono…">
+            <select id="cli-filtro">
+              <option value="">Todas</option>
+              <option value="acepta">Quieren recibir ofertas</option>
+              <option value="cumple">Con cumpleaños cargado</option>
+              <option value="repiten">Compraron más de una vez</option>
+            </select>
+            <button class="btn" id="cli-nueva">+ Agregar clienta</button>
+            <span class="contador" id="cli-contador"></span>
+          </div>
+          <p class="sub">Se arma sola con los pedidos de la web. También podés cargar a mano a las clientas del mostrador. Solo escribiles con ofertas a las que marcaron que quieren recibirlas.</p>
+          <div id="clientes-lista"></div>
+        </div>
+      </section>
+
+      <!-- Novedades -->
+      <section id="tab-novedades" hidden>
+        <div class="panel">
+          <div class="toolbar">
+            <h2 style="margin:0;">Novedades de la web</h2>
+            <button class="btn" id="nov-nueva" style="margin-left:auto;">+ Nueva novedad</button>
+          </div>
+          <p class="sub">Cursos, tips de maquillaje, lanzamientos y sorteos. Lo que cargues acá aparece en la sección «Novedades» de la web; si no hay ninguna visible, la sección se oculta sola. La de más arriba se ve primero.</p>
+          <div id="nov-lista"></div>
+        </div>
+      </section>
+
+      <!-- Categorías -->
+      <section id="tab-categorias" hidden>
+        <div class="panel">
+          <h2>Categorías</h2>
+          <p class="sub">A la izquierda están las categorías tal como vienen de tu sistema; a la derecha, en qué sección de la web se muestran. Lo que cambies acá se aplica a todos los productos de esa categoría (salvo los que fijaste a mano uno por uno).</p>
+          <div id="cats-lista"></div>
+          <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap;">
+            <button class="btn" id="cats-guardar">Guardar y aplicar</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Tienda -->
+      <section id="tab-tienda" hidden>
+        <div class="panel">
+          <h2>Datos de la tienda</h2>
+          <p class="sub">Estos datos aparecen en la web y en el pedido por WhatsApp. Guardá y en un minuto ya se ven.</p>
+          <form id="tienda-form">
+            <div class="fila">
+              <div class="campo"><label>Nombre de la tienda</label><input id="t-nombre"></div>
+              <div class="campo"><label>WhatsApp para pedidos</label><input id="t-whatsapp" inputmode="numeric" placeholder="595975158244"><div class="ayuda">Con código de país, sin + ni espacios (ej.: 595975158244).</div></div>
+            </div>
+            <div class="fila">
+              <div class="campo"><label>Dirección</label><input id="t-direccion"></div>
+              <div class="campo"><label>Horario</label><input id="t-horario"></div>
+            </div>
+            <div class="fila">
+              <div class="campo"><label>Delivery en Pilar — zona Centro (Gs.)</label><input id="t-delcentro" inputmode="numeric"></div>
+              <div class="campo"><label>Delivery en Pilar — zonas alejadas (Gs.)</label><input id="t-dellejos" inputmode="numeric"></div>
+            </div>
+            <div class="campo"><label>Marcas que se muestran</label><input id="t-marcas" placeholder="SHEGLAM, Ruby Rose, D'Hermosa"><div class="ayuda">Separadas por coma.</div></div>
+            <div class="fila">
+              <div class="campo"><label>Instagram (link)</label><input id="t-instagram"></div>
+              <div class="campo"><label>Facebook (link)</label><input id="t-facebook"></div>
+            </div>
+            <div class="campo"><label>Google Maps (link «Cómo llegar»)</label><input id="t-maps"></div>
+            <button class="btn" type="submit">Guardar</button>
+          </form>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- ===== Modal producto ===== -->
+  <div class="overlay" id="modal" hidden>
+    <div class="modal">
+      <div class="modal-head"><h3 id="m-titulo">Producto</h3><button class="btn-ic" id="m-cerrar" aria-label="Cerrar">✕</button></div>
+      <div class="modal-body">
+        <div class="foto-box">
+          <div class="foto-prev" id="m-foto-prev">🛍️</div>
+          <div class="foto-acciones">
+            <label class="btn sec chico" style="cursor:pointer;">📷 Subir foto<input type="file" id="m-foto" accept="image/*" style="display:none;"></label>
+            <button class="btn gris chico" id="m-foto-quitar" type="button" hidden>Quitar foto</button>
+            <p>Se achica y comprime sola antes de subir. Ideal: foto vertical (4:5) sobre fondo claro.</p>
+            <p id="m-foto-estado"></p>
+          </div>
+        </div>
+        <div class="fila">
+          <div class="campo"><label>Código</label><input id="m-codigo"><div class="ayuda" id="m-codigo-ayuda"></div></div>
+          <div class="campo"><label>Categoría en el sistema</label><input id="m-categoria"></div>
+        </div>
+        <div class="campo"><label>Nombre (como viene del sistema)</label><input id="m-nombre"></div>
+        <div class="campo"><label>Nombre para la web (opcional)</label><input id="m-nombreweb" placeholder="Si lo dejás vacío se usa el nombre del sistema"><div class="ayuda">Este nombre no se pisa cuando importás.</div></div>
+        <div class="fila">
+          <div class="campo"><label>Precio (Gs.)</label><input id="m-precio" inputmode="numeric"><div class="ayuda" id="m-precio-ayuda"></div></div>
+          <div class="campo"><label>Stock</label><input id="m-stock" inputmode="numeric"><div class="ayuda" id="m-stock-ayuda"></div></div>
+        </div>
+        <div class="fila">
+          <div class="campo"><label>Sección de la web</label><select id="m-catweb"></select><div class="ayuda">Si la cambiás a mano, queda fija aunque importes de nuevo.</div></div>
+          <div class="campo"><label>Orden entre los destacados</label><input id="m-orden" inputmode="numeric" placeholder="1 = primero"></div>
+        </div>
+        <div class="campo"><label>Descripción para la web (opcional)</label><textarea id="m-descripcion" rows="2" maxlength="300" placeholder="Ej.: Incluye máscara, delineador y sombras. Ideal para regalar."></textarea></div>
+        <label class="check"><input type="checkbox" id="m-visible"> Se muestra en la web</label>
+        <label class="check"><input type="checkbox" id="m-destacado"> ★ Destacado (aparece arriba, en «Nuestros favoritos», con su foto)</label>
+        <p class="sub" id="m-estado" style="margin-top:8px;"></p>
+      </div>
+      <div class="modal-foot">
+        <button class="btn peligro chico izq" id="m-eliminar" hidden>Eliminar</button>
+        <button class="btn gris" id="m-cancelar">Cancelar</button>
+        <button class="btn" id="m-guardar">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Modal clienta ===== -->
+  <div class="overlay" id="modal-cli" hidden>
+    <div class="modal" style="width:min(560px,100%);">
+      <div class="modal-head"><h3 id="mc-titulo">Clienta</h3><button class="btn-ic" id="mc-cerrar" aria-label="Cerrar">✕</button></div>
+      <div class="modal-body">
+        <div class="fila">
+          <div class="campo"><label>Nombre</label><input id="mc-nombre" maxlength="80"></div>
+          <div class="campo"><label>Teléfono (WhatsApp)</label><input id="mc-telefono" inputmode="tel" maxlength="30" placeholder="0975 123 456"></div>
+        </div>
+        <div class="fila">
+          <div class="campo"><label>Cumpleaños — día</label><select id="mc-dia"></select></div>
+          <div class="campo"><label>Cumpleaños — mes</label><select id="mc-mes"></select></div>
+        </div>
+        <label class="check"><input type="checkbox" id="mc-acepta"> Quiere recibir ofertas y saludos por WhatsApp</label>
+        <div class="ayuda" style="font-size:.76rem;color:var(--vino-soft);margin:-2px 0 10px 28px;">Marcalo solo si ella te lo pidió o lo aceptó.</div>
+        <div class="campo"><label>Nota (solo la ves vos)</label><textarea id="mc-nota" rows="2" maxlength="300" placeholder="Ej.: tono de base 02, prefiere Ruby Rose, revende."></textarea></div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn peligro chico izq" id="mc-borrar" hidden>Borrar sus datos</button>
+        <button class="btn gris" id="mc-cancelar">Cancelar</button>
+        <button class="btn" id="mc-guardar">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Modal novedad ===== -->
+  <div class="overlay" id="modal-nov" hidden>
+    <div class="modal" style="width:min(620px,100%);">
+      <div class="modal-head"><h3 id="mn-titulo-modal">Novedad</h3><button class="btn-ic" id="mn-cerrar" aria-label="Cerrar">✕</button></div>
+      <div class="modal-body">
+        <div class="fila">
+          <div class="campo"><label>Tipo</label><select id="mn-tipo"><option>Curso</option><option>Tip</option><option>Novedad</option><option>Sorteo</option><option>Promo</option></select></div>
+          <div class="campo"><label>Fecha (opcional)</label><input id="mn-fecha" maxlength="40" placeholder="Ej.: Sábado 18 de octubre, 15 h"></div>
+        </div>
+        <div class="campo"><label>Título</label><input id="mn-titulo" maxlength="90" placeholder="Ej.: Curso de automaquillaje"></div>
+        <div class="campo"><label>Texto</label><textarea id="mn-texto" rows="4" maxlength="400" placeholder="Dos o tres frases: qué es, dónde, cuánto cuesta, qué incluye."></textarea></div>
+        <div class="campo"><label>Texto del botón (opcional)</label><input id="mn-boton" maxlength="30" placeholder="Ej.: Quiero anotarme"><div class="ayuda">Si lo completás, aparece un enlace que abre WhatsApp con la consulta ya escrita sobre esta novedad.</div></div>
+        <div class="foto-box">
+          <div class="foto-prev" id="mn-foto-prev" style="aspect-ratio:16/10;">📰</div>
+          <div class="foto-acciones">
+            <label class="btn sec chico" style="cursor:pointer;">📷 Subir foto<input type="file" id="mn-foto" accept="image/*" style="display:none;"></label>
+            <button class="btn gris chico" id="mn-foto-quitar" type="button" hidden>Quitar foto</button>
+            <p>Opcional. Queda mejor una foto horizontal.</p>
+            <p id="mn-foto-estado"></p>
+          </div>
+        </div>
+        <label class="check"><input type="checkbox" id="mn-visible"> Se muestra en la web</label>
+      </div>
+      <div class="modal-foot">
+        <button class="btn peligro chico izq" id="mn-eliminar" hidden>Eliminar</button>
+        <button class="btn gris" id="mn-cancelar">Cancelar</button>
+        <button class="btn" id="mn-guardar">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="/config.js"></script>
+  <script src="/admin/logica.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.19.0/firebase-storage-compat.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="/admin/app.js"></script>
+</body>
+</html>

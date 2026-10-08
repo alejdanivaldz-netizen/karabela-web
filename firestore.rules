@@ -1,0 +1,56 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Admin = cualquier usuario que pudo iniciar sesión.
+    // El registro de usuarios nuevos está deshabilitado en Authentication,
+    // así que solo entran los usuarios creados a mano en la consola.
+    function admin() {
+      return request.auth != null;
+    }
+
+    // Catálogo publicado: lo lee la web pública (sin login), lo escribe el panel.
+    match /publico/{doc} {
+      allow read: if true;
+      allow write: if admin();
+    }
+
+    // Productos y configuración: solo desde el panel.
+    match /productos/{id} {
+      allow read, write: if admin();
+    }
+    match /config/{doc} {
+      allow read, write: if admin();
+    }
+
+    // Fichas de clientas (nombre, teléfono, cumpleaños, notas): solo desde el panel.
+    match /clientes/{id} {
+      allow read, write: if admin();
+    }
+
+    // Pedidos: la web pública solo puede CREAR (con forma válida); el panel los lee y cambia el estado.
+    match /pedidos/{id} {
+      allow create: if pedidoValido(request.resource.data);
+      allow read, update, delete: if admin();
+    }
+    function pedidoValido(d) {
+      return d.origen == 'web'
+        && d.estado == 'nuevo'
+        && d.fecha is timestamp
+        && d.cliente is map
+        && d.cliente.nombre is string && d.cliente.nombre.size() > 0 && d.cliente.nombre.size() <= 80
+        && d.cliente.keys().hasOnly(['nombre', 'telefono', 'acepta', 'cumple'])
+        && (!('telefono' in d.cliente) || (d.cliente.telefono is string && d.cliente.telefono.size() <= 30))
+        && (!('acepta' in d.cliente) || d.cliente.acepta is bool)
+        && (!('cumple' in d.cliente) || (d.cliente.cumple is string && d.cliente.cumple.matches('^(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$')))
+        && d.items is list && d.items.size() > 0 && d.items.size() <= 80
+        && d.total is number && d.total >= 0 && d.total < 1000000000
+        && d.keys().hasOnly(['origen', 'estado', 'fecha', 'cliente', 'entrega', 'nota', 'items', 'subtotal', 'total']);
+    }
+
+    // Todo lo demás, cerrado.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
